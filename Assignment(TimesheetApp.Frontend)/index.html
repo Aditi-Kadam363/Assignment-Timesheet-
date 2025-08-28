@@ -12,7 +12,7 @@
   <button onclick="login()" class="btn btn-primary">Login</button>
 
   <h2 class="mt-4">Register</h2>
-  <input id="name" class="form-control mb-2" placeholder="Name">
+  <input id="regname" class="form-control mb-2" placeholder="Name">
   <input id="regEmail" class="form-control mb-2" placeholder="Email">
   <input id="regPassword" type="password" class="form-control mb-2" placeholder="Password">
   <button onclick="register()" class="btn btn-success">Register</button>
@@ -37,7 +37,7 @@ async function register(){
   let res = await fetch("https://localhost:7065/api/employee/register", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({ name: name.value, email: regEmail.value, password: regPassword.value })
+    body: JSON.stringify({ name: regname.value, email: regEmail.value, password: regPassword.value })
   });
   if(res.ok) alert("Registered Successfully");
 }

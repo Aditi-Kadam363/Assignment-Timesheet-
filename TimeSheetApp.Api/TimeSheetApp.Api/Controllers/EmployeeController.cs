@@ -13,12 +13,13 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpPost("register")]
-    public IActionResult Register(Employee employee)
+    public IActionResult Register([FromBody] Employee employee)
     {
         _context.Employees.Add(employee);
         _context.SaveChanges();
         return Ok("Employee Registered Successfully");
     }
+
 
     [HttpPost("login")]
     public IActionResult Login([FromBody] Employee emp)

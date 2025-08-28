@@ -10,7 +10,8 @@
   <input id="date" type="date" class="form-control mb-2">
   <input id="hours" type="number" class="form-control mb-2" placeholder="Hours Worked">
   <input id="task" class="form-control mb-2" placeholder="Task Description">
-  <button onclick="addTimesheet()" class="btn btn-primary">Add</button>
+<button id="addBtn" onclick="addOrUpdateTimesheet()" class="btn btn-primary">Add</button>
+
 
   <h3 class="mt-4">Your Timesheets</h3>
   <table class="table" id="timesheetTable">
@@ -32,6 +33,7 @@ async function loadTimesheets(){
       <td>${t.hoursWorked}</td>
       <td>${t.taskDescription}</td>
       <td>
+        <button class="btn btn-warning btn-sm" onclick="editTimesheet(${t.timesheetId}, '${t.date}', ${t.hoursWorked}, '${t.taskDescription}')">Edit</button>
         <button onclick="deleteTimesheet(${t.timesheetId})" class="btn btn-danger btn-sm">Delete</button>
       </td>
     </tr>`;
@@ -51,6 +53,61 @@ async function addTimesheet(){
   });
   loadTimesheets();
 }
+//edit part
+let editingId = null; // Track which timesheet we are editing
+
+function editTimesheet(id, date, hours, task) {
+  editingId = id; // store the ID being edited
+
+  // Prefill the form fields
+  document.getElementById("date").value = date.split("T")[0]; 
+  document.getElementById("hours").value = hours;
+  document.getElementById("task").value = task;
+
+  // Change button text to Update
+  document.getElementById("addBtn").innerText = "Update";
+}
+
+async function addOrUpdateTimesheet() {
+  let sheet = {
+    employeeId: localStorage.getItem("employeeId"),
+    date: document.getElementById("date").value,
+    hoursWorked: document.getElementById("hours").value,
+    taskDescription: document.getElementById("task").value
+  };
+
+  if (editingId) {
+    // Update existing timesheet
+    let res = await fetch(`https://localhost:7065/api/timesheet/${editingId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(sheet)
+    });
+    if (res.ok) {
+      alert("Updated Successfully");
+      editingId = null;
+      document.getElementById("addBtn").innerText = "Add";
+      loadTimesheets();
+    }
+  } else {
+    // Add new timesheet
+    let res = await fetch("https://localhost:7065/api/timesheet", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(sheet)
+    });
+    if (res.ok) {
+      alert("Added Successfully");
+      loadTimesheets();
+    }
+  }
+
+  // Clear inputs
+  document.getElementById("date").value = "";
+  document.getElementById("hours").value = "";
+  document.getElementById("task").value = "";
+}
+
 
 async function deleteTimesheet(id){
   await fetch(`https://localhost:7065/api/timesheet/${id}`, { method:"DELETE" });
